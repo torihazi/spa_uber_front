@@ -74,11 +74,12 @@ const Foods = () => {
       .then(() => navigate("/orders"))
       .catch((e) => {
         if (e.response.status === HTTP_STATUS_CODE.NOT_ACCEPTABLE) {
+          console.log(e);
           setState({
             ...state,
             isOpenOrderDialog: false,
             isOpenNewOrderDialog: true,
-            existingRestaurantName: e.response.existing_restaurant,
+            existingRestaurantName: e.response.data.existing_restaurant,
             newRestaurantName: e.response.data.new_restaurant,
           });
         } else {

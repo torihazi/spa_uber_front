@@ -32,7 +32,7 @@ export const replaceLineFoods = (params) => {
 export const fetchLineFoods = () => {
   return axios
     .get(lineFoods)
-    .thee((res) => {
+    .then((res) => {
       return res.data;
     })
     .catch((e) => {
