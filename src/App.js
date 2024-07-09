@@ -11,8 +11,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/restaurants" element={<Restaurants />} />
-        <Route path="/restaurants/:restaurantsId/foods" element={<Foods />} />
-        <Route path="/restaurants/:restaurantsId/orders" element={<Orders />} />
+        <Route path="/restaurants/:restaurantId/foods" element={<Foods />} />
+        <Route path="/orders" element={<Orders />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
