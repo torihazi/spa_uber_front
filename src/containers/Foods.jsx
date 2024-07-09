@@ -12,13 +12,17 @@ import FoodImage from "../images/food-image.jpg";
 import { FoodOrderDialog } from "../components/FoodOrderDialog";
 
 import { fetchFoods } from "../apis/foods";
-import { REQUEST_STATE } from "../constants";
-import { Link, useParams } from "react-router-dom";
+import { postLineFoods, replaceLineFoods } from "../apis/line_foods";
+
+import { HTTP_STATUS_CODE, REQUEST_STATE } from "../constants";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   foodsReducer,
   initialState as foodsInitialState,
   foodsActionTypes,
 } from "../reducers/foods";
+
+import { NewOrderConfirmDialog } from "../components/NewOrderConfirmDialog";
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -50,16 +54,44 @@ const ItemWrapper = styled.div`
 
 const Foods = () => {
   const { restaurantId } = useParams();
+  const navigate = useNavigate();
   const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
   const initialState = {
     isOpenOrderDialog: false,
     selectedFood: null,
     selectedFoodCount: 1,
+    isOpenNewOrderDialog: false,
+    existingRestaurantName: "",
+    newRestaurantName: "",
   };
   const [state, setState] = useState(initialState);
 
   const submitOrder = () => {
-    console.log("登録ボタンが押された");
+    postLineFoods({
+      foodId: state.selectedFood.id,
+      count: state.selectedFoodCount,
+    })
+      .then(() => navigate("/orders"))
+      .catch((e) => {
+        if (e.response.status === HTTP_STATUS_CODE.NOT_ACCEPTABLE) {
+          setState({
+            ...state,
+            isOpenOrderDialog: false,
+            isOpenNewOrderDialog: true,
+            existingRestaurantName: e.response.existing_restaurant,
+            newRestaurantName: e.response.data.new_restaurant,
+          });
+        } else {
+          throw e;
+        }
+      });
+  };
+
+  const replaceOrder = () => {
+    replaceLineFoods({
+      foodId: state.selectedFood.id,
+      count: state.selectedFoodCount,
+    }).then(() => navigate("/orders"));
   };
 
   useEffect(() => {
@@ -138,6 +170,20 @@ const Foods = () => {
               selectedFood: null,
             })
           }
+        />
+      )}
+      {state.isOpenNewOrderDialog && (
+        <NewOrderConfirmDialog
+          isOpen={state.isOpenNewOrderDialog}
+          onClose={() =>
+            setState({
+              ...state,
+              isOpenNewOrderDialog: false,
+            })
+          }
+          existingRestaurantName={state.existingRestaurantName}
+          newRestaurantName={state.newRestaurantName}
+          onClickSubmit={() => replaceOrder()}
         />
       )}
     </>
