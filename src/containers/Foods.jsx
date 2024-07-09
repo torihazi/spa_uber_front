@@ -2,7 +2,7 @@ import React, { useEffect, useReducer, useState } from "react";
 
 import styled from "styled-components";
 import { COLORS } from "../style_constants";
-import { LocalMallIcon } from "../components/icons";
+import { LocalMallIcon } from "../components/Icons";
 
 import { Skeleton } from "@mui/material";
 import { FoodWrapper } from "../components/FoodWrapper";
@@ -57,6 +57,10 @@ const Foods = () => {
     selectedFoodCount: 1,
   };
   const [state, setState] = useState(initialState);
+
+  const submitOrder = () => {
+    console.log("登録ボタンが押された");
+  };
 
   useEffect(() => {
     dispatch({ type: foodsActionTypes.FETCHING });
@@ -113,10 +117,25 @@ const Foods = () => {
         <FoodOrderDialog
           food={state.selectedFood}
           isOpen={state.isOpenOrderDialog}
+          countNumber={state.selectedFoodCount}
+          onClickCountUp={() => {
+            setState({
+              ...state,
+              selectedFoodCount: state.selectedFoodCount + 1,
+            });
+          }}
+          onClickCountDown={() => {
+            setState({
+              ...state,
+              selectedFoodCount: state.selectedFoodCount - 1,
+            });
+          }}
+          onClickOrder={() => submitOrder()}
           onClose={() =>
             setState({
               ...state,
               isOpenOrderDialog: false,
+              selectedFood: null,
             })
           }
         />
